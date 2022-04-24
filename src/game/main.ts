@@ -2,6 +2,6 @@ export {
 	startGame,
 }
 
-function startGame(canvas: HTMLCanvasElment) {
+function startGame(canvas: HTMLCanvasElement) {
 	console.log("TS game, canvas:", canvas);
 }
