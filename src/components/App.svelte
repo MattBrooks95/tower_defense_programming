@@ -3,7 +3,7 @@ import Game from "./Game.svelte";
 </script>
 
 <main class="container bb">
-	<Game class="contents"></Game>
+	<Game></Game>
 </main>
 
 <style>
@@ -21,9 +21,5 @@ main.container {
 
 .bb {
 	box-sizing: border-box;
-}
-
-.contents {
-	background-color: yellow;
 }
 </style>

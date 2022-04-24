@@ -1,7 +1,5 @@
 <script lang="ts">
 export let canvas = undefined;
-
-const
 </script>
 
 <canvas bind:this={canvas}>

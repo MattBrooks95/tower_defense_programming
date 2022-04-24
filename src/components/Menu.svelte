@@ -1,10 +1,12 @@
 <script lang="ts">
 import Button from "./elements/Button.svelte"
+
+export let startGameCallback: () => void | undefined = undefined;
 </script>
 
 <div class="menu">
 	<div class="list flexcol">
-		<Button text={"Start Game"} />
+		<Button text={"Start Game"} onclick={startGameCallback}/>
 	</div>
 </div>
 
