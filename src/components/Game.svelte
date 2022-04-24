@@ -4,20 +4,23 @@ import Menu from "./Menu.svelte";
 
 import { startGame } from "../game/main.ts"
 
-startGame();
+const startGameCallback = () => {
+	startGame(canvas);
+}
+
+let canvas = undefined;
 </script>
 
 <main>
-<GameView class="GameView fill"/>
-<Menu class="Menu fill" id="menu"/>
+<GameView class="GameView fill" bind:canvas/>
+<Menu
+	class="Menu fill"
+	id="menu"
+	startGameCallback={startGameCallback}/>
+	<span>why</span>
 </main>
 
 <style>
-/* TODO how do I share this across the codebase?*/
-.fill {
-	width: 100%;
-	height: 100%;
-}
 main {
 	position: relative;
 	width: 100%;

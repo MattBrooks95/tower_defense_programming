@@ -7,7 +7,6 @@ const isWatch = process.env.WATCH;
 
 esbuild.build({
 	entryPoints: [
-		"src/game/main.ts",
 		"src/app.ts",
 	],
 	bundle: true,

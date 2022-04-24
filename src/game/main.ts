@@ -3,5 +3,5 @@ export {
 }
 
 function startGame(canvas: HTMLCanvasElment) {
-	console.log("TS game");
+	console.log("TS game, canvas:", canvas);
 }
