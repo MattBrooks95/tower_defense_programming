@@ -20,10 +20,13 @@ export {
 function startGame(canvas: HTMLCanvasElement) {
 	console.log("TS game, canvas:", canvas);
 	const gameQueue = newGameQueue();
-	gameQueue.setupCallbacks();
+	//so the canvas gets keyboard events
+	canvas.tabIndex = -1;
+	canvas.focus();
+	gameQueue.setupCallbacks(canvas);
 	const gameRenderer = newGameRenderer();
 	runGame(getInitialGameState(), gameRenderer, gameQueue);
-	gameQueue.teardownCallbacks();
+	//gameQueue.teardownCallbacks(canvas);
 }
 
 function runGame(
@@ -34,4 +37,5 @@ function runGame(
 	if (gameState.over) {
 		return gameState;
 	}
+	//runGame(gameState, gameRenderer, gameQueue);
 }

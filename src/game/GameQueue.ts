@@ -4,13 +4,20 @@ export {
 }
 
 type GameQueue = {
-	setupCallbacks: () => void;
-	teardownCallbacks: () => void;
+	setupCallbacks: (targetElement: HTMLElement) => void;
+	teardownCallbacks: (targetElement: HTMLElement) => void;
 }
 
 function newGameQueue(): GameQueue {
+	const keyDown = (event: KeyboardEvent) => {
+		console.log(`key event:${event.key}`);
+	}
 	return {
-		setupCallbacks: () => console.log("TODO"),
-		teardownCallbacks: () => console.log("TODO"),
+		setupCallbacks: (targetElement: HTMLElement) => {
+			targetElement.addEventListener("keydown", keyDown);
+		},
+		teardownCallbacks: (targetElement: HTMLElement) => {
+			targetElement.removeEventListener("keydown", keyDown);
+		},
 	}
 }
