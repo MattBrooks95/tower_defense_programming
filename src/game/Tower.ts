@@ -1,0 +1,6 @@
+export {
+	Tower,
+}
+
+type Tower = {
+}

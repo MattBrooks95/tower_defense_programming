@@ -1,0 +1,7 @@
+export {
+	Environment
+}
+
+type Environment = {
+}
+
