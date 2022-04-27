@@ -6,18 +6,29 @@ export {
 type GameQueue = {
 	setupCallbacks: (targetElement: HTMLElement) => void;
 	teardownCallbacks: (targetElement: HTMLElement) => void;
+	getEvents: () => Event[];
 }
 
-function newGameQueue(): GameQueue {
+function newGameQueue(): () => GameQueue {
+	const events = [];
 	const keyDown = (event: KeyboardEvent) => {
-		console.log(`key event:${event.key}`);
+		events.push(event.key);
 	}
-	return {
-		setupCallbacks: (targetElement: HTMLElement) => {
-			targetElement.addEventListener("keydown", keyDown);
-		},
-		teardownCallbacks: (targetElement: HTMLElement) => {
-			targetElement.removeEventListener("keydown", keyDown);
-		},
+	return function(){
+		return {
+			setupCallbacks: (targetElement: HTMLElement) => {
+				targetElement.addEventListener("keydown", keyDown);
+			},
+			teardownCallbacks: (targetElement: HTMLElement) => {
+				targetElement.removeEventListener("keydown", keyDown);
+			},
+			getEvents: () => {
+				const eventsClone = [...events];
+				//indiscriminately throwing these events away will not work
+				//in most games
+				eventsClone.slice();
+				return eventsClone;
+			}
+		}
 	}
 }
