@@ -23,8 +23,8 @@ function startGame(canvas: HTMLCanvasElement) {
 	const gameQueue = newGameQueue()();
 	//so the canvas gets keyboard events
 	canvas.tabIndex = -1;
-	canvas.focus();
 	gameQueue.setupCallbacks(canvas);
+	canvas.focus();
 	const gameHolder = { game: getInitialGameState() };
 	//@ts-ignore
 	window.game = gameHolder;
@@ -35,13 +35,19 @@ function startGame(canvas: HTMLCanvasElement) {
 			if (gameHolder.game.over) {
 				clearInterval(gameClock);
 				gameQueue.teardownCallbacks(canvas);
+				throw new Error('game over');
 			}
 		},
-		1000,
+		8,
 	);
 	//TODO this forces the game to stop after 30 seconds
 	setTimeout(() => clearInterval(gameClock), 30000);
-	//gameQueue.teardownCallbacks(canvas);
+	gameQueue.teardownCallbacks(canvas);
+}
+
+function canProcessEvent(key: string) {
+	console.log('can process event:', { key });
+	return key === 'Escape';
 }
 
 function runGame(
@@ -54,9 +60,14 @@ function runGame(
 	}
 	const newEvents = gameQueue.getEvents();
 	console.log(`events:`, newEvents);
-	const newGameState = Object.assign({}, prevGameState);
-	const keyEvents = newEvents.filter(newEvent => newEvent instanceof KeyboardEvent) as KeyboardEvent[];
-	newGameState.keyStrokes = keyEvents.map(keyEvent => keyEvent.key);
+	const keyboardEvents = newEvents.filter(newEvent => newEvent instanceof KeyboardEvent) as KeyboardEvent[];
+	const processableKeyboardEvents = keyboardEvents.filter(keyEvent => canProcessEvent(keyEvent.key));
+	console.log(`processable:`, processableKeyboardEvents);
+	const newGameStateAttributes = getInitialGameState();
+	if (processableKeyboardEvents.length > 0) {
+		newGameStateAttributes.over = true;
+	}
+	const newGameState = Object.assign({}, prevGameState, newGameStateAttributes);
 	if (!isSame(prevGameState, newGameState)) {
 		gameRenderer.render(Object.assign({}, newGameState));
 	}

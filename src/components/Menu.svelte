@@ -2,9 +2,10 @@
 import Button from "./elements/Button.svelte"
 
 export let startGameCallback: () => void | undefined = undefined;
+export let menuContainer = undefined;
 </script>
 
-<div class="menu">
+<div class="menu" bind:this={menuContainer}>
 	<div class="list flexcol">
 		<Button text={"Start Game"} onclick={startGameCallback}/>
 	</div>

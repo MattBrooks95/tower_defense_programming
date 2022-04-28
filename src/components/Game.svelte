@@ -4,11 +4,13 @@ import Menu from "./Menu.svelte";
 
 import { startGame } from "../game/main.ts"
 
+let canvas = undefined;
+let menuContainer = undefined;
+
 const startGameCallback = () => {
 	startGame(canvas);
+	menuContainer.style.pointerEvents = "none";
 }
-
-let canvas = undefined;
 </script>
 
 <main>
@@ -16,7 +18,7 @@ let canvas = undefined;
 <Menu
 	class="Menu fill"
 	id="menu"
-	startGameCallback={startGameCallback}/>
+	startGameCallback={startGameCallback} bind:menuContainer/>
 </main>
 
 <style>

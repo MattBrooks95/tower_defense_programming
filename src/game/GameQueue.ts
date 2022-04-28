@@ -12,7 +12,7 @@ type GameQueue = {
 function newGameQueue(): () => GameQueue {
 	const events = [];
 	const keyDown = (event: KeyboardEvent) => {
-		events.push(event.key);
+		events.push(event);
 	}
 	return function(){
 		return {
@@ -26,7 +26,7 @@ function newGameQueue(): () => GameQueue {
 				const eventsClone = [...events];
 				//indiscriminately throwing these events away will not work
 				//in most games
-				eventsClone.slice();
+				//events.slice();
 				return eventsClone;
 			}
 		}
