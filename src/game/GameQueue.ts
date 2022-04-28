@@ -12,6 +12,7 @@ type GameQueue = {
 function newGameQueue(): () => GameQueue {
 	const events = [];
 	const keyDown = (event: KeyboardEvent) => {
+		console.log('game q', { event });
 		events.push(event);
 	}
 	return function(){

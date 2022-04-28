@@ -9,7 +9,8 @@ let menuContainer = undefined;
 
 const startGameCallback = () => {
 	startGame(canvas);
-	menuContainer.style.pointerEvents = "none";
+	//TODO instead of messing with the element like this, figure out conditional rendering for svelte components
+	menuContainer.style.display = "none";
 }
 </script>
 
