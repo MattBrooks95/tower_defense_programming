@@ -23,9 +23,7 @@ function startGame(canvas: HTMLCanvasElement) {
 	const gameQueue = newGameQueue()();
 	//so the canvas gets keyboard events
 	canvas.tabIndex = -1;
-	//gameQueue.setupCallbacks(canvas);
-	//TODO why can I not just put the callbacks on the canvas? I did the tabIndex thing...
-	gameQueue.setupCallbacks(window);
+	gameQueue.setupCallbacks(canvas);
 	canvas.focus();
 	const gameHolder = { game: getInitialGameState() };
 	//@ts-ignore
@@ -36,8 +34,8 @@ function startGame(canvas: HTMLCanvasElement) {
 			gameHolder.game = runGame(gameHolder.game, gameRenderer, gameQueue);
 			if (gameHolder.game.over) {
 				clearInterval(gameClock);
-				gameQueue.teardownCallbacks(window);
-				throw new Error('game over');
+				gameQueue.teardownCallbacks(canvas);
+				console.log('game over');
 			}
 		},
 		8,
