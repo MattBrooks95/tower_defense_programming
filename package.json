@@ -4,7 +4,8 @@
   "description": "learn to program by coding behaviors in a tower defense game",
   "main": "index.js",
   "scripts": {
-    "build": "node esbuild",
+    "build": "DEV=true node esbuild",
+	"buildProd": "node esbuild",
 	"watch": "WATCH=true node esbuild"
   },
   "author": "Matt D Brooks",

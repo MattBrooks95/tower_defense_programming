@@ -4,6 +4,7 @@ const sveltePreprocess = require("svelte-preprocess");
 
 const outDir = "build";
 const isWatch = process.env.WATCH;
+const isDev = process.env.DEV === 'true';
 
 esbuild.build({
 	entryPoints: [
@@ -17,5 +18,8 @@ esbuild.build({
 			preprocess: sveltePreprocess()
 		}),
 	],
-	watch: isWatch !== undefined
+	watch: isWatch !== undefined,
+	define: {
+		isDev
+	}
 }).catch(() => process.exit(1));

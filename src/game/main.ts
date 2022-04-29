@@ -26,8 +26,12 @@ function startGame(canvas: HTMLCanvasElement, onGameEnd: () => void) {
 	gameQueue.setupCallbacks(canvas);
 	canvas.focus();
 	const gameHolder = { game: getInitialGameState() };
-	//@ts-ignore
-	window.game = gameHolder;
+	console.log(`isDev:${isDev}`);
+	if (isDev) {
+		//for debugging game state through the dev tools
+		//@ts-ignore
+		window.game = gameHolder;
+	}
 	const gameRenderer = newGameRenderer();
 	const gameClock = setInterval(
 		() => {
