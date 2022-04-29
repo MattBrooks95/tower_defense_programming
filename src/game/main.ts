@@ -18,7 +18,7 @@ export {
 	startGame,
 }
 
-function startGame(canvas: HTMLCanvasElement) {
+function startGame(canvas: HTMLCanvasElement, onGameEnd: () => void) {
 	console.log("TS game, canvas:", canvas);
 	const gameQueue = newGameQueue()();
 	//so the canvas gets keyboard events
@@ -36,6 +36,7 @@ function startGame(canvas: HTMLCanvasElement) {
 				clearInterval(gameClock);
 				gameQueue.teardownCallbacks(canvas);
 				console.log('game over');
+				onGameEnd();
 			}
 		},
 		8,

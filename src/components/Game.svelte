@@ -7,20 +7,23 @@ import { startGame } from "../game/main.ts"
 let canvas = undefined;
 let menuContainer = undefined;
 
+let gameStarted = false;
+
 const startGameCallback = () => {
-	startGame(canvas);
-	//TODO instead of messing with the element like this, figure out conditional rendering for svelte components
-	menuContainer.style.display = "none";
+	startGame(canvas, () => gameStarted = false);
+	gameStarted = true;
 }
 </script>
 
 <main>
 <GameView class="GameView fill" bind:canvas/>
+{#if !gameStarted}
 <Menu
 	class="Menu fill"
 	id="menu"
 	startGameCallback={startGameCallback}
 	bind:menuContainer/>
+{/if}
 </main>
 
 <style>
