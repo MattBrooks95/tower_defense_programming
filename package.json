@@ -6,7 +6,8 @@
   "scripts": {
     "build": "DEV=true node esbuild",
 	"buildProd": "node esbuild",
-	"watch": "WATCH=true node esbuild"
+	"watch": "WATCH=true node esbuild",
+	"validate": "tsc"
   },
   "author": "Matt D Brooks",
   "license": "MIT",

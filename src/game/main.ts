@@ -28,8 +28,6 @@ function startGame(canvas: HTMLCanvasElement, onGameEnd: () => void) {
 	const gameHolder = { game: getInitialGameState() };
 	console.log(`isDev:${isDev}`);
 	if (isDev) {
-		//for debugging game state through the dev tools
-		//@ts-ignore
 		window.game = gameHolder;
 	}
 	const gameRenderer = newGameRenderer();
