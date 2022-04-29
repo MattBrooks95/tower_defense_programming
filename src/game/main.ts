@@ -57,16 +57,35 @@ function runGame(
 	if (prevGameState.over) {
 		return prevGameState;
 	}
-	const newEvents = gameQueue.getEvents();
-	const keyboardEvents = newEvents.filter(newEvent => newEvent instanceof KeyboardEvent) as KeyboardEvent[];
-	const processableKeyboardEvents = keyboardEvents.filter(keyEvent => canProcessKey(keyEvent.key));
 	const newGameStateAttributes = getInitialGameState();
-	if (processableKeyboardEvents.length > 0) {
-		newGameStateAttributes.over = true;
-	}
+
+	const { keyboardEvents } = filterEvents(gameQueue.getEvents());
+
+	handleKeyboardEvents(prevGameState, newGameStateAttributes, keyboardEvents);
+
 	const newGameState = Object.assign({}, prevGameState, newGameStateAttributes);
+
 	if (!isSame(prevGameState, newGameState)) {
 		gameRenderer.render(Object.assign({}, newGameState));
 	}
+
 	return newGameState;
+}
+
+function filterEvents(newEvents: Event[]): { keyboardEvents: KeyboardEvent[] } {
+	const keyboardEvents = newEvents.filter(newEvent => newEvent instanceof KeyboardEvent) as KeyboardEvent[];
+
+	return {
+		keyboardEvents,
+	}
+}
+function handleKeyboardEvents(
+	prevGameState: GameState,
+	newGameStateAttributes: GameState,
+	keyboardEvents: KeyboardEvent[],
+): void {
+	const processableKeyboardEvents = keyboardEvents.filter(keyEvent => canProcessKey(keyEvent.key));
+	if (processableKeyboardEvents.length > 0) {
+		newGameStateAttributes.over = true;
+	}
 }
