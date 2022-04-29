@@ -42,7 +42,7 @@ function startGame(canvas: HTMLCanvasElement) {
 	);
 }
 
-function canProcessEvent(key: string) {
+function canProcessKey(key: string) {
 	return key === 'Escape';
 }
 
@@ -56,7 +56,7 @@ function runGame(
 	}
 	const newEvents = gameQueue.getEvents();
 	const keyboardEvents = newEvents.filter(newEvent => newEvent instanceof KeyboardEvent) as KeyboardEvent[];
-	const processableKeyboardEvents = keyboardEvents.filter(keyEvent => canProcessEvent(keyEvent.key));
+	const processableKeyboardEvents = keyboardEvents.filter(keyEvent => canProcessKey(keyEvent.key));
 	const newGameStateAttributes = getInitialGameState();
 	if (processableKeyboardEvents.length > 0) {
 		newGameStateAttributes.over = true;

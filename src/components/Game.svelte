@@ -19,7 +19,8 @@ const startGameCallback = () => {
 <Menu
 	class="Menu fill"
 	id="menu"
-	startGameCallback={startGameCallback} bind:menuContainer/>
+	startGameCallback={startGameCallback}
+	bind:menuContainer/>
 </main>
 
 <style>
