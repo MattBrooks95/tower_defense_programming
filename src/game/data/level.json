@@ -1,0 +1,20 @@
+{
+	"boardSize": [32, 18],
+	"enemies": {
+		"spawn": [0, 9],
+		"speed": 125,
+		"direction": "right",
+		"count": 10,
+		"spawnRate": 125
+	},
+	"towers": [
+		{
+			"position": [9, 8],
+			"fireRate": 250
+		},
+		{
+			"position": [11, 10],
+			"fireRate": 250
+		}
+	]
+}

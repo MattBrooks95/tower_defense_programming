@@ -1,3 +1,4 @@
+import { Level } from "./data/level";
 import {
 	Tile,
 } from "./Tile"
@@ -8,18 +9,41 @@ export {
 	isSame
 }
 
+export enum Direction { Right, Left }
+
+type Position = [number, number];
+
+export type Enemy = {
+	position: Position;
+	speed: number;
+	direction: Direction;
+}
+
+type Tower = {
+	position: Position;
+	fireRate: number;
+}
+
 type GameState = {
 	over: boolean;
 	tiles: Tile[];
 	//dummy state to test event loop
 	keyStrokes: string[];
+	level: Level;
+	enemies: Enemy[];
+	towers: Tower[];
+	currentTick: number;
 }
 
-function getInitialGameState(): GameState {
+function getInitialGameState(level: Level): GameState {
 	return {
 		over: false,
 		tiles: [],
-		keyStrokes: []
+		keyStrokes: [],
+		level,
+		enemies: [],
+		towers: [],
+		currentTick: 0
 	}
 }
 

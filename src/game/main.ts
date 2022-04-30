@@ -1,4 +1,6 @@
 import {
+    Direction,
+    Enemy,
 	GameState,
 	getInitialGameState,
     isSame,
@@ -6,17 +8,20 @@ import {
 
 import {
 	GameRenderer,
-	newGameRenderer,
+	render,
 } from "./GameRenderer"
 
 import {
 	GameQueue,
 	newGameQueue,
 } from "./GameQueue"
+import * as level from "./data/level.json";
+import { Level } from "./data/level";
 
 export {
 	startGame,
 }
+
 
 function startGame(canvas: HTMLCanvasElement, onGameEnd: () => void) {
 	console.log("TS game, canvas:", canvas);
@@ -25,15 +30,14 @@ function startGame(canvas: HTMLCanvasElement, onGameEnd: () => void) {
 	canvas.tabIndex = -1;
 	gameQueue.setupCallbacks(canvas);
 	canvas.focus();
-	const gameHolder = { game: getInitialGameState() };
+	const gameHolder = { game: getInitialGameState(getLevel()) };
 	console.log(`isDev:${isDev}`);
 	if (isDev) {
 		window.game = gameHolder;
 	}
-	const gameRenderer = newGameRenderer();
 	const gameClock = setInterval(
 		() => {
-			gameHolder.game = runGame(gameHolder.game, gameRenderer, gameQueue);
+			gameHolder.game = runGame(gameHolder.game, render, gameQueue);
 			if (gameHolder.game.over) {
 				clearInterval(gameClock);
 				gameQueue.teardownCallbacks(canvas);
@@ -43,6 +47,10 @@ function startGame(canvas: HTMLCanvasElement, onGameEnd: () => void) {
 		},
 		8,
 	);
+}
+
+function getLevel(): Level {
+	return level as Level;
 }
 
 function canProcessKey(key: string) {
@@ -57,18 +65,20 @@ function runGame(
 	if (prevGameState.over) {
 		return prevGameState;
 	}
-	const newGameStateAttributes = getInitialGameState();
+	const newGameStateAttributes = getInitialGameState(prevGameState.level);
 
 	const { keyboardEvents } = filterEvents(gameQueue.getEvents());
 
 	handleKeyboardEvents(prevGameState, newGameStateAttributes, keyboardEvents);
+	simulate(prevGameState, newGameStateAttributes);
 
 	const newGameState = Object.assign({}, prevGameState, newGameStateAttributes);
 
 	if (!isSame(prevGameState, newGameState)) {
-		gameRenderer.render(Object.assign({}, newGameState));
+		gameRenderer(Object.assign({}, newGameState));
 	}
 
+	newGameState.currentTick += 1;
 	return newGameState;
 }
 
@@ -79,6 +89,28 @@ function filterEvents(newEvents: Event[]): { keyboardEvents: KeyboardEvent[] } {
 		keyboardEvents,
 	}
 }
+
+function simulate(prevGameState: GameState, nextGameState: GameState): void {
+	const newEnemies: Enemy[] = [];
+	if (prevGameState.level.enemies.count > 0  && prevGameState.currentTick % prevGameState.level.enemies.spawnRate) {
+		newEnemies.push({
+			position: [0, 0],//TODO figure out world units
+			speed: prevGameState.level.enemies.speed,
+			direction: prevGameState.level.enemies.direction === "right" ? Direction.Right : Direction.Left,
+		});
+		nextGameState.level.enemies.count = prevGameState.level.enemies.count - 1;
+	}
+	//move the enemies for this tick
+	const currentEnemies = prevGameState.enemies.map(enemy => {
+		//TODO
+		return enemy;
+	});
+	//add the new enemies, if any, to the enemies list
+	//after processing the ones that were already there
+	nextGameState.enemies = currentEnemies.concat(newEnemies)
+
+}
+
 function handleKeyboardEvents(
 	prevGameState: GameState,
 	newGameStateAttributes: GameState,
