@@ -1,9 +1,14 @@
 <script lang="ts">
-import Game from "./Game.svelte";
+//import Game from "./Game.svelte";
+
+//let startGameCallback: Function | undefined = undefined;
+const { startGameCallback } = $$props;
+//console.log('props:', $$props);
+console.log(startGameCallback);
 </script>
 
 <main class="container bb">
-	<Game></Game>
+	<!--<Game></Game>-->
 </main>
 
 <style>

@@ -1,19 +1,20 @@
 const esbuild = require("esbuild");
-const sveltePlugin = require("esbuild-svelte");
+const esbuildSvelte = require("esbuild-svelte");
 const sveltePreprocess = require("svelte-preprocess");
 
 const outDir = "build";
 const isWatch = process.env.WATCH;
 const isDev = process.env.DEV === 'true';
 
-esbuild.build({
+const buildConfig = {
 	entryPoints: [
-		"src/game/main.ts",
+		"src/app.ts",
 	],
+	mainFields: ["svelte", "browser", "module", "main"],
 	bundle: true,
 	outdir: outDir,
 	plugins: [
-		sveltePlugin({
+		esbuildSvelte({
 			preprocess: sveltePreprocess()
 		}),
 	],
@@ -21,4 +22,8 @@ esbuild.build({
 	define: {
 		isDev
 	}
-}).catch(() => process.exit(1));
+};
+
+console.log(buildConfig);
+
+esbuild.build(buildConfig).catch(() => process.exit(1));
