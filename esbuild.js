@@ -9,7 +9,6 @@ const isDev = process.env.DEV === 'true';
 esbuild.build({
 	entryPoints: [
 		"src/game/main.ts",
-		//"src/app.ts",
 	],
 	bundle: true,
 	outdir: outDir,
