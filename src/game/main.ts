@@ -7,8 +7,11 @@ import {
 } from "./GameState";
 
 import {
+    camera,
 	GameRenderer,
 	render,
+    renderer,
+    scene,
 } from "./GameRenderer"
 
 import {
@@ -34,6 +37,11 @@ function startGame(canvas: HTMLCanvasElement, onGameEnd: () => void) {
 	console.log(`isDev:${isDev}`);
 	if (isDev) {
 		window.game = gameHolder;
+		window.graphics = {
+			camera,
+			renderer,
+			scene
+		}
 	}
 	const gameClock = setInterval(
 		() => {
@@ -74,8 +82,9 @@ function runGame(
 
 	const newGameState = Object.assign({}, prevGameState, newGameStateAttributes);
 
-	if (!isSame(prevGameState, newGameState)) {
+	if (prevGameState.renderCount == 0 || !isSame(prevGameState, newGameState)) {
 		gameRenderer(Object.assign({}, newGameState));
+		newGameState.renderCount++;
 	}
 
 	newGameState.currentTick += 1;

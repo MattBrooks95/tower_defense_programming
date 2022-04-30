@@ -4,6 +4,11 @@ export {}
 declare global {
 	interface Window {
 		game?: Object;
+		graphics?: {
+			camera: Camera;
+			renderer: WebGLRenderer;
+			scene: Scene;
+		}
 	}
 	var isDev: boolean;
 }

@@ -33,6 +33,7 @@ type GameState = {
 	enemies: Enemy[];
 	towers: Tower[];
 	currentTick: number;
+	renderCount: number;
 }
 
 function getInitialGameState(level: Level): GameState {
@@ -43,7 +44,8 @@ function getInitialGameState(level: Level): GameState {
 		level,
 		enemies: [],
 		towers: [],
-		currentTick: 0
+		currentTick: 0,
+		renderCount: 0,
 	}
 }
 
