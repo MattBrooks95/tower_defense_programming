@@ -36,7 +36,7 @@ function startGame(canvas: HTMLCanvasElement, onGameEnd: () => void) {
 	const gameHolder = { game: getInitialGameState(getLevel()) };
 	console.log(`isDev:${isDev}`);
 	if (isDev) {
-		window.game = gameHolder;
+		window.gameHolder = gameHolder;
 		window.graphics = {
 			camera,
 			renderer,

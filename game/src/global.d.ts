@@ -3,7 +3,7 @@ export {}
 
 declare global {
 	interface Window {
-		game?: Object;
+		gameHolder?: Object;
 		graphics?: {
 			camera: Camera;
 			renderer: WebGLRenderer;
