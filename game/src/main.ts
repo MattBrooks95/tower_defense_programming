@@ -34,7 +34,6 @@ function startGame(canvas: HTMLCanvasElement, onGameEnd: () => void) {
 	gameQueue.setupCallbacks(canvas);
 	canvas.focus();
 	const gameHolder = { game: getInitialGameState(getLevel()) };
-	console.log(`isDev:${isDev}`);
 	if (isDev) {
 		window.gameHolder = gameHolder;
 		window.graphics = {
@@ -46,10 +45,10 @@ function startGame(canvas: HTMLCanvasElement, onGameEnd: () => void) {
 	const gameClock = setInterval(
 		() => {
 			gameHolder.game = runGame(gameHolder.game, render, gameQueue);
-			console.log({
-				currentTick: gameHolder.game.currentTick,
-				renderCount: gameHolder.game.renderCount
-			});
+			//console.log({
+			//	currentTick: gameHolder.game.currentTick,
+			//	renderCount: gameHolder.game.renderCount
+			//});
 			if (gameHolder.game.over) {
 				clearInterval(gameClock);
 				gameQueue.teardownCallbacks(canvas);
@@ -77,21 +76,24 @@ function runGame(
 	if (prevGameState.over) {
 		return prevGameState;
 	}
-	const newGameStateAttributes = getInitialGameState(prevGameState.level);
+	//const newGameStateAttributes = getInitialGameState(prevGameState.level);
+	const newGameState: GameState = Object.assign({}, prevGameState);
 
 	const { keyboardEvents } = filterEvents(gameQueue.getEvents());
 
-	handleKeyboardEvents(prevGameState, newGameStateAttributes, keyboardEvents);
-	simulate(prevGameState, newGameStateAttributes);
+	handleKeyboardEvents(newGameState, keyboardEvents);
+	simulate(prevGameState, newGameState);
 
-	const newGameState = Object.assign({}, prevGameState, newGameStateAttributes);
+	console.log({
+		prevGameState,
+		newGameState,
+	});
 
 	if (prevGameState.renderCount == 0 || !isSame(prevGameState, newGameState)) {
-		gameRenderer(Object.assign({}, newGameState));
+		gameRenderer(newGameState);
 		newGameState.renderCount++;
 	}
 
-	newGameState.currentTick += 1;
 	return newGameState;
 }
 
@@ -121,16 +123,15 @@ function simulate(prevGameState: GameState, nextGameState: GameState): void {
 	//add the new enemies, if any, to the enemies list
 	//after processing the ones that were already there
 	nextGameState.enemies = currentEnemies.concat(newEnemies)
-
+	nextGameState.currentTick++;
 }
 
 function handleKeyboardEvents(
-	prevGameState: GameState,
-	newGameStateAttributes: GameState,
+	newGameState: GameState,
 	keyboardEvents: KeyboardEvent[],
 ): void {
 	const processableKeyboardEvents = keyboardEvents.filter(keyEvent => canProcessKey(keyEvent.key));
 	if (processableKeyboardEvents.length > 0) {
-		newGameStateAttributes.over = true;
+		newGameState.over = true;
 	}
 }

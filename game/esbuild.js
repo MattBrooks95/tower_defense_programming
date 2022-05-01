@@ -16,6 +16,7 @@ const buildConfig = {
 	},
 	target: "esnext",
 	globalName: isDev ? "game" : undefined,
+	sourcemap: isDev ? "linked" : undefined,
 };
 
 console.log(buildConfig);

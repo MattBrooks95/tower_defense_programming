@@ -49,9 +49,12 @@ function getInitialGameState(level: Level): GameState {
 	}
 }
 
+//because it's a simulation I think it will always be different anyway
 function isSame(state1: GameState, state2: GameState): boolean {
-	return state1.over === state2.over
-		&& state1.tiles.length === state2.tiles.length//TODO dummy check
-		&& state1.keyStrokes.toString() === state2.keyStrokes.toString()
+	return false;
+	//return state1.over === state2.over
+	//	&& state1.enemies.length === state2.enemies.length
+	//	&& state1.enemies.map(enemy => enemy.position)
+	//	&& state1.keyStrokes.toString() === state2.keyStrokes.toString()
 }
 
