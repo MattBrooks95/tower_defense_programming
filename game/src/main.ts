@@ -83,10 +83,10 @@ function runGame(
 	handleKeyboardEvents(newGameState, keyboardEvents);
 	simulate(prevGameState, newGameState);
 
-	console.log({
-		prevGameState,
-		newGameState,
-	});
+	//console.log({
+	//	prevGameState,
+	//	newGameState,
+	//});
 
 	if (prevGameState.renderCount == 0 || !isSame(prevGameState, newGameState)) {
 		gameRenderer(newGameState);
