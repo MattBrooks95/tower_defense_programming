@@ -2,9 +2,10 @@
   "name": "game",
   "version": "1.0.0",
   "description": "",
-  "main": "esbuild.js",
+  "main": "build/index.js",
   "scripts": {
-    "build": "node esbuild"
+    "build": "node esbuild",
+	"validate": "npx tsc"
   },
   "author": "",
   "license": "ISC",

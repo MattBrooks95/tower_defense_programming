@@ -18,8 +18,8 @@ import {
 	GameQueue,
 	newGameQueue,
 } from "./GameQueue"
-import * as level from "./data/level.json";
-import { Level } from "./data/level";
+import * as level from "../data/level.json";
+import { Level } from "../data/level";
 
 export {
 	startGame,

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<link rel="stylesheet" href="build/app.css" />
+	<!--<link rel="stylesheet" href="build/app.css" />-->
 	<style>
 		html, body {
 			height: 100%;
@@ -15,6 +15,11 @@
 	</style>
 </head>
 <body>
-	<script type="text/javascript" src="build/app.js"></script>
+	<!--<script type="text/javascript" src="build/app.js"></script>-->
+	<canvas id="dummyCanvas" width=500 height=500></canvas>
+	<script src="game/build/index.js"></script>
+	<script type="text/javascript">
+		game.startGame(document.querySelector("#dummyCanvas"));
+	</script>
 </body>
 </html>

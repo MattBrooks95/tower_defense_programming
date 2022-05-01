@@ -1,4 +1,4 @@
-import { startGame } from "./main";
+import { startGame } from "./src/main";
 
 export {
 	startGame,

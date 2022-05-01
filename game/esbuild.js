@@ -13,8 +13,14 @@ const buildConfig = {
 	watch: isWatch !== undefined,
 	define: {
 		isDev
-	}
+	},
+	target: "esnext",
 };
+
+if (isDev) {
+	//exposes the game to the global object
+	buildConfig.globalName = isDev && "game";
+}
 
 console.log(buildConfig);
 
