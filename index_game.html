@@ -11,13 +11,25 @@
 			margin: 0;
 			padding: 0;
 		}
+		canvas#dummyCanvas {
+			border: solid 1px black;
+		}
 	</style>
 </head>
 <body>
 	<canvas id="dummyCanvas" width=500 height=500></canvas>
 	<script src="game/build/index.js"></script>
+	<button id="startGameButton">start</button>
 	<script type="text/javascript">
-		game.startGame(document.querySelector("#dummyCanvas"));
+		const button = document.querySelector("button#startGameButton");
+		const canvas = document.querySelector("#dummyCanvas");
+		if (!button) {
+			throw new Error('no button');
+		}
+		if (!canvas) {
+			throw new Error('no canvas');
+		}
+		button.addEventListener("click", () => game.startGame(canvas));
 	</script>
 </body>
 </html>
