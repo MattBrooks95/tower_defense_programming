@@ -15,12 +15,8 @@ const buildConfig = {
 		isDev
 	},
 	target: "esnext",
+	globalName: isDev ? "game" : undefined,
 };
-
-if (isDev) {
-	//exposes the game to the global object
-	buildConfig.globalName = isDev && "game";
-}
 
 console.log(buildConfig);
 
