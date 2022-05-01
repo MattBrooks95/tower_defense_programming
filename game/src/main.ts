@@ -46,11 +46,15 @@ function startGame(canvas: HTMLCanvasElement, onGameEnd: () => void) {
 	const gameClock = setInterval(
 		() => {
 			gameHolder.game = runGame(gameHolder.game, render, gameQueue);
+			console.log({
+				currentTick: gameHolder.game.currentTick,
+				renderCount: gameHolder.game.renderCount
+			});
 			if (gameHolder.game.over) {
 				clearInterval(gameClock);
 				gameQueue.teardownCallbacks(canvas);
 				console.log('game over');
-				onGameEnd();
+				onGameEnd && onGameEnd();
 			}
 		},
 		8,
