@@ -1,10 +1,10 @@
-import { Box3, BoxGeometry, Group, Mesh, MeshBasicMaterial, Object3D, OrthographicCamera, Scene, Vector3, WebGLRenderer } from "three";
+import { Box3, BoxGeometry, Color, DoubleSide, Group, Mesh, MeshBasicMaterial, Object3D, OrthographicCamera, Scene, Vector3, WebGLRenderer } from "three";
 import { GameState } from "./GameState";
 
 export {
 	GameRenderer,
-	//newGameRenderer,
 	render,
+	init
 }
 
 type GameRenderer = (gameState: GameState) => void;
@@ -32,31 +32,57 @@ type GameRenderer = (gameState: GameState) => void;
 //}
 //const objectCache: {[index: string], Object} = {};
 const tileMaterial = new MeshBasicMaterial({
-
+	color: new Color(0, 1, 0),
+	side: DoubleSide,
 });
 
-const tileGeometry = new BoxGeometry();
+const tileWidth = 50;
+const tileHeight = 50;
 
-export const scene = new Scene();
-export const camera = new OrthographicCamera();
+const tileGeometry = new BoxGeometry(tileWidth, tileHeight);
+
+let scene: Scene;// = new Scene();
+let camera: OrthographicCamera;// = new OrthographicCamera();
 let cameraAreaSet = false;
-export const renderer = new WebGLRenderer();
+let renderer: WebGLRenderer;// = new WebGLRenderer();
+
+function init(canvas: HTMLCanvasElement): {
+	renderer: WebGLRenderer;
+	scene: Scene;
+	camera: OrthographicCamera;
+} {
+	renderer = new WebGLRenderer({
+		canvas,
+	});
+	renderer.setClearColor(new Color(0.2, 0.2, 0.2), 0);
+	camera = new OrthographicCamera();
+	scene = new Scene();
+
+	return {
+		renderer,
+		camera,
+		scene,
+	}
+}
 
 //if I don't plan on having tiles change during runtime
 //should probably just make them once and leave them in the scene
 function render(gameState: GameState): void {
-	const tileWidth = 50;
-	const tileHeight = 50;
-	const [width, height] = gameState.level.boardSize;
+	const [numTilesWidth, numTilesHeight] = gameState.level.boardSize;
+	const width = numTilesWidth * tileWidth;
+	const height = numTilesHeight * tileHeight;
 	const tilesContainer: Group = new Group();
 
-	for(let tileIndex = 0, numTiles = width * height; tileIndex < numTiles; tileIndex++) {
+	const startPlacingPoint = new Vector3(-width / 2, height / 2);
+
+	for(let tileIndex = 0, numTiles = numTilesWidth * numTilesHeight; tileIndex < numTiles; tileIndex++) {
 		tilesContainer.add(new Mesh(tileGeometry, tileMaterial));
 	}
+
 	tilesContainer.children.forEach((tile: Object3D, index: number) => {
 		tile.position.set(
-			(tileWidth * 0.5) * (index % width + 1),
-			(tileHeight * 0.5) * (index % height + 1),
+			startPlacingPoint.x + (tileWidth * 0.5) * (index % numTilesWidth + 1),
+			startPlacingPoint.y - (tileHeight * 0.5) * (index % numTilesHeight + 1),
 			0
 		);
 	});
@@ -68,17 +94,22 @@ function render(gameState: GameState): void {
 	scene.remove(...scene.children);
 	scene.add(tilesContainer);
 	if (!cameraAreaSet) {
-		camera.position.copy(tileAreaCenter);
+		camera.position.copy(new Vector3(0, 0, -1));
 		camera.left = tileArea.min.x;
 		camera.right = tileArea.max.x;
 		camera.top = tileArea.max.y;
 		camera.bottom = tileArea.min.y;
 		camera.updateMatrixWorld();
+		camera.updateMatrix();//TODO which of these do I need
 		cameraAreaSet = true;
 	}
 	requestAnimationFrame(() => {
+		renderer.clearColor();
 		renderer.render(scene, camera);
-		console.log(`render count:${gameState.renderCount}`);
+		console.log(`render count:${gameState.renderCount}`, {
+			renderer,
+			camera
+		});
 	});
 }
 

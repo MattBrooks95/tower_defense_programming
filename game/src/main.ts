@@ -7,11 +7,9 @@ import {
 } from "./GameState";
 
 import {
-    camera,
-	GameRenderer,
+	init as initRenderer,
 	render,
-    renderer,
-    scene,
+	GameRenderer,
 } from "./GameRenderer"
 
 import {
@@ -32,6 +30,7 @@ function startGame(canvas: HTMLCanvasElement, onGameEnd: () => void) {
 	//so the canvas gets keyboard events
 	canvas.tabIndex = -1;
 	gameQueue.setupCallbacks(canvas);
+	const { camera, renderer, scene } = initRenderer(canvas);
 	canvas.focus();
 	const gameHolder = { game: getInitialGameState(getLevel()) };
 	if (isDev) {
