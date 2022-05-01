@@ -18,6 +18,7 @@ let canvas = undefined;
 	id="menu"
 	startGameCallback={startGameCallback}/>
 	<span>why</span>
+	<span>why</span>
 </main>
 
 <style>
