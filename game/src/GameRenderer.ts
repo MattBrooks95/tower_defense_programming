@@ -135,8 +135,10 @@ function render(gameState: GameState): void {
 
 	const tilePlacements: {xLoc: number; yLoc: number;}[] = [];
 	tiles.forEach((tile: Object3D, index: number) => {
+		//const xLoc = startPlacingPoint.x;
+		//const yLoc = startPlacingPoint.y; 
 		const xLoc = startPlacingPoint.x + tileWidth * (index % numTilesWidth);
-		const yLoc = startPlacingPoint.y - tileHeight * (Math.floor(index / numTilesHeight)); 
+		const yLoc = startPlacingPoint.y - tileHeight * (Math.floor(index / numTilesWidth)); 
 		tile.position.set(
 			xLoc,
 			yLoc,
@@ -179,10 +181,14 @@ function render(gameState: GameState): void {
 		//camera.right = tileArea.max.x;
 		//camera.top = tileArea.max.y;
 		//camera.bottom = tileArea.min.y;
-		camera.left = -halfTileAreaWidth;
-		camera.right = halfTileAreaWidth;
-		camera.top = halfTileAreaHeight;
-		camera.bottom = -halfTileAreaWidth;
+		//camera.left = -halfTileAreaWidth;
+		//camera.right = halfTileAreaWidth;
+		//camera.top = halfTileAreaHeight;
+		//camera.bottom = -halfTileAreaWidth;
+		camera.left = -width / 2;
+		camera.right = width / 2;
+		camera.top = height / 2;
+		camera.bottom = -height / 2;
 
 		camera.updateProjectionMatrix();
 		camera.updateMatrixWorld();
