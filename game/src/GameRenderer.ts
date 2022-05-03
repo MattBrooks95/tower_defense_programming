@@ -123,13 +123,13 @@ function render(gameState: GameState): void {
 
 	for(let tileIndex = 0, numTiles = numTilesWidth * numTilesHeight; tileIndex < numTiles; tileIndex++) {
 		const tile = new Mesh(tileGeometry, tileMaterial);
-		//if (isDev) {
-		//	const edgeLines = new LineSegments(tileEdgesGeometry, edgeLinesMaterial);
-		//	edgeLines.name = "debug_edgelines";
-		//	edgeLines.position.z = depths.debugEdgelines;
-		//	tile.add(edgeLines);
-		//}
-		//tilesContainer.add(tile);
+		if (isDev) {
+			const edgeLines = new LineSegments(tileEdgesGeometry, edgeLinesMaterial);
+			edgeLines.name = "debug_edgelines";
+			edgeLines.position.z = depths.debugEdgelines;
+			tile.add(edgeLines);
+		}
+		tile.add(tile);
 		tiles.push(tile);
 	}
 
