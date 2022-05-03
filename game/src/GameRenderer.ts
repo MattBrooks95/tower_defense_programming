@@ -129,14 +129,11 @@ function render(gameState: GameState): void {
 			edgeLines.position.z = depths.debugEdgelines;
 			tile.add(edgeLines);
 		}
-		tile.add(tile);
 		tiles.push(tile);
 	}
 
 	const tilePlacements: {xLoc: number; yLoc: number;}[] = [];
 	tiles.forEach((tile: Object3D, index: number) => {
-		//const xLoc = startPlacingPoint.x;
-		//const yLoc = startPlacingPoint.y; 
 		const xLoc = startPlacingPoint.x + tileWidth * (index % numTilesWidth);
 		const yLoc = startPlacingPoint.y - tileHeight * (Math.floor(index / numTilesWidth)); 
 		tile.position.set(
@@ -145,15 +142,9 @@ function render(gameState: GameState): void {
 			depths.ground
 		);
 		tilePlacements.push({ xLoc, yLoc });
-		//tile.position.set(
-		//	10,
-		//	10,
-		//	depths.ground
-		//);
 		tile.matrixWorldNeedsUpdate = true;
 		tile.updateMatrixWorld();
 	});
-	//tilesContainer.matrixWorldNeedsUpdate = true;
 	scene.remove(...scene.children);
 	scene.add(...tiles);
 	
@@ -177,14 +168,6 @@ function render(gameState: GameState): void {
 	if (!cameraAreaSet) {
 		camera.position.copy(new Vector3(0, 0, 1));
 		//console.log(`camera ratio: ${(tileArea.max.x - tileArea.min.x) / (tileArea.max.y - tileArea.min.y)}`, tileArea);
-		//camera.left = tileArea.min.x;
-		//camera.right = tileArea.max.x;
-		//camera.top = tileArea.max.y;
-		//camera.bottom = tileArea.min.y;
-		//camera.left = -halfTileAreaWidth;
-		//camera.right = halfTileAreaWidth;
-		//camera.top = halfTileAreaHeight;
-		//camera.bottom = -halfTileAreaWidth;
 		camera.left = -width / 2;
 		camera.right = width / 2;
 		camera.top = height / 2;
