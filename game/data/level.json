@@ -1,5 +1,5 @@
 {
-	"boardSize": [32, 18],
+	"boardSize": [16, 9],
 	"enemies": {
 		"spawn": [0, 9],
 		"speed": 125,

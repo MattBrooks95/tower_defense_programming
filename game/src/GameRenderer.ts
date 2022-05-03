@@ -63,8 +63,17 @@ const debugAxisPoints = [
 	new Vector3(1000, 0, debugAxisZ),
 	new Vector3(0, 1000, debugAxisZ),
 	new Vector3(0, -1000, debugAxisZ),
+	//for debugging world coords
 	new Vector3(-0.05, -0.05, debugAxisZ),
 	new Vector3(0.05, 0.05, debugAxisZ),
+	new Vector3(0.0, 0.0, debugAxisZ),
+	new Vector3(0.0, 0.1, debugAxisZ),
+	new Vector3(0.0, 0.1, debugAxisZ),
+	new Vector3(0.1, 0.1, debugAxisZ),
+	new Vector3(0.1, 0.1, debugAxisZ),
+	new Vector3(0.1, 0.0, debugAxisZ),
+	new Vector3(0.1, 0.0, debugAxisZ),
+	new Vector3(0.0, 0.0, debugAxisZ),
 ];
 const debugLinesMaterial = new LineBasicMaterial({color: colors.red})
 const debugLinesGeometry = new BufferGeometry().setFromPoints(debugAxisPoints);
@@ -104,37 +113,50 @@ function render(gameState: GameState): void {
 	const [numTilesWidth, numTilesHeight] = gameState.level.boardSize;
 	const width = numTilesWidth * tileWidth;
 	const height = numTilesHeight * tileHeight;
-	const tilesContainer: Group = new Group();
+	console.log(`board size: ${width}x${height}`);
+	//const tilesContainer: Group = new Group();
+	//tilesContainer.name = "tile_container";
+	const tiles: Object3D[] = [];
 
-	const startPlacingPoint = new Vector3(-width / 2, height / 2);
-	console.log({startPlacingPoint});
+	const startPlacingPoint = new Vector3((-width / 2) + tileWidth / 2, (height / 2) - tileHeight / 2);
+	console.log('start point', {startPlacingPoint});
 
 	for(let tileIndex = 0, numTiles = numTilesWidth * numTilesHeight; tileIndex < numTiles; tileIndex++) {
 		const tile = new Mesh(tileGeometry, tileMaterial);
-		if (isDev) {
-			const edgeLines = new LineSegments(tileEdgesGeometry, edgeLinesMaterial);
-			edgeLines.name = "debug_edgelines";
-			edgeLines.position.z = depths.debugEdgelines;
-			tile.add(edgeLines);
-		}
-		tilesContainer.add(tile);
+		//if (isDev) {
+		//	const edgeLines = new LineSegments(tileEdgesGeometry, edgeLinesMaterial);
+		//	edgeLines.name = "debug_edgelines";
+		//	edgeLines.position.z = depths.debugEdgelines;
+		//	tile.add(edgeLines);
+		//}
+		//tilesContainer.add(tile);
+		tiles.push(tile);
 	}
 
-	tilesContainer.children.forEach((tile: Object3D, index: number) => {
+	const tilePlacements: {xLoc: number; yLoc: number;}[] = [];
+	tiles.forEach((tile: Object3D, index: number) => {
+		const xLoc = startPlacingPoint.x + tileWidth * (index % numTilesWidth);
+		const yLoc = startPlacingPoint.y - tileHeight * (Math.floor(index / numTilesHeight)); 
 		tile.position.set(
-			startPlacingPoint.x + (tileWidth * 0.5) * (index % numTilesWidth + 1),
-			startPlacingPoint.y - (tileHeight * 0.5) * (index % numTilesHeight + 1),
+			xLoc,
+			yLoc,
 			depths.ground
 		);
-		tile.position.set(
-			10,
-			10,
-			depths.ground
-		);
+		tilePlacements.push({ xLoc, yLoc });
+		//tile.position.set(
+		//	10,
+		//	10,
+		//	depths.ground
+		//);
 		tile.matrixWorldNeedsUpdate = true;
+		tile.updateMatrixWorld();
 	});
+	//tilesContainer.matrixWorldNeedsUpdate = true;
+	scene.remove(...scene.children);
+	scene.add(...tiles);
 	
-	const tileArea = new Box3().setFromObject(tilesContainer);
+	const tileArea = new Box3().setFromObject(scene);
+	console.log(tilePlacements, /*tilesContainer,*/ tileArea);
 	const tileAreaCenter = new Vector3();
 	tileArea.getCenter(tileAreaCenter);
 	const tileAreaWidth = tileArea.max.x - tileArea.min.x;
@@ -142,24 +164,27 @@ function render(gameState: GameState): void {
 	const tileAreaHeight = tileArea.max.y - tileArea.min.y;
 	const halfTileAreaHeight = tileAreaHeight / 2;
 
-	scene.remove(...scene.children);
-	scene.add(tilesContainer);
 	if (isDev) {
-		scene.add(new LineSegments(
+		const debugAxis = new LineSegments(
 			debugLinesGeometry,
 			debugLinesMaterial,
-		));
+		);
+		debugAxis.name = "debug_axis";
+		scene.add(debugAxis);
 	}
 	if (!cameraAreaSet) {
 		camera.position.copy(new Vector3(0, 0, 1));
-		camera.left = tileArea.min.x;
-		camera.right = tileArea.max.x;
-		camera.top = tileArea.max.y;
-		camera.bottom = tileArea.min.y;
-		//camera.left = -halfTileAreaWidth;
-		//camera.right = halfTileAreaWidth;
-		//camera.top = halfTileAreaHeight;
-		//camera.bottom = -halfTileAreaWidth;
+		//console.log(`camera ratio: ${(tileArea.max.x - tileArea.min.x) / (tileArea.max.y - tileArea.min.y)}`, tileArea);
+		//camera.left = tileArea.min.x;
+		//camera.right = tileArea.max.x;
+		//camera.top = tileArea.max.y;
+		//camera.bottom = tileArea.min.y;
+		camera.left = -halfTileAreaWidth;
+		camera.right = halfTileAreaWidth;
+		camera.top = halfTileAreaHeight;
+		camera.bottom = -halfTileAreaWidth;
+
+		camera.updateProjectionMatrix();
 		camera.updateMatrixWorld();
 		camera.updateMatrix();//TODO which of these do I need
 		cameraAreaSet = true;
