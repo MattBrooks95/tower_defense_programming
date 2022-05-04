@@ -7,7 +7,7 @@ export {
 	init
 }
 
-type GameRenderer = (gameState: GameState) => void;
+type GameRenderer = (gameState: GameState, firstRender: boolean) => void;
 
 ////TODO actually make this a function and not an object with extra steps
 ////TODO render the game state
@@ -81,7 +81,6 @@ const debugLinesGeometry = new BufferGeometry().setFromPoints(debugAxisPoints);
 
 let scene: Scene;
 let camera: OrthographicCamera;
-let cameraAreaSet = false;
 let renderer: WebGLRenderer;
 
 function init(canvas: HTMLCanvasElement): {
@@ -151,7 +150,7 @@ function calculateTileLocations(
 
 //if I don't plan on having tiles change during runtime
 //should probably just make them once and leave them in the scene
-function render(gameState: GameState): void {
+function render(gameState: GameState, firstRender: boolean): void {
 	const [numTilesWidth, numTilesHeight] = gameState.level.boardSize;
 	const width = numTilesWidth * tileWidth;
 	const height = numTilesHeight * tileHeight;
@@ -180,14 +179,6 @@ function render(gameState: GameState): void {
 	});
 	scene.remove(...scene.children);
 	scene.add(tilesContainer);
-	
-	const tileArea = new Box3().setFromObject(scene);
-	const tileAreaCenter = new Vector3();
-	tileArea.getCenter(tileAreaCenter);
-	const tileAreaWidth = tileArea.max.x - tileArea.min.x;
-	const halfTileAreaWidth = tileAreaWidth / 2;
-	const tileAreaHeight = tileArea.max.y - tileArea.min.y;
-	const halfTileAreaHeight = tileAreaHeight / 2;
 
 	if (isDev) {
 		const debugAxis = new LineSegments(
@@ -197,7 +188,7 @@ function render(gameState: GameState): void {
 		debugAxis.name = "debug_axis";
 		scene.add(debugAxis);
 	}
-	if (!cameraAreaSet) {
+	if (firstRender) {
 		camera.position.copy(new Vector3(0, 0, 1));
 		//console.log(`camera ratio: ${(tileArea.max.x - tileArea.min.x) / (tileArea.max.y - tileArea.min.y)}`, tileArea);
 		camera.left = -width / 2;

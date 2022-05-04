@@ -88,8 +88,9 @@ function runGame(
 	//	newGameState,
 	//});
 
-	if (prevGameState.renderCount == 0 || !isSame(prevGameState, newGameState)) {
-		gameRenderer(newGameState);
+	const isFirstRender = prevGameState.renderCount == 0;
+	if (isFirstRender || !isSame(prevGameState, newGameState)) {
+		gameRenderer(newGameState, isFirstRender);
 		newGameState.renderCount++;
 	}
 
