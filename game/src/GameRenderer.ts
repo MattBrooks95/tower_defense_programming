@@ -155,40 +155,34 @@ function render(gameState: GameState, firstRender: boolean): void {
 	const width = numTilesWidth * tileWidth;
 	const height = numTilesHeight * tileHeight;
 	console.log(`board size: ${width}x${height}`);
-
-	const startPlacingPoint = new Vector3((-width / 2) + tileWidth / 2, (height / 2) - tileHeight / 2);
-	console.log('start point', {startPlacingPoint});
-
-	const tilesContainer = makeTiles(numTilesWidth, numTilesHeight, tileGeometry, tileMaterial);
-
-	const tileLocations = calculateTileLocations(
-		tileWidth,
-		tileHeight,
-		numTilesWidth,
-		numTilesHeight,
-		depths.ground,
-		startPlacingPoint
-	);
-	tilesContainer.children.forEach((tile: Object3D, index: number) => {
-		const position = tileLocations[index];
-		tile.position.copy(
-			position
-		);
-		tile.matrixWorldNeedsUpdate = true;
-		tile.updateMatrixWorld();
-	});
-	scene.remove(...scene.children);
-	scene.add(tilesContainer);
-
-	if (isDev) {
-		const debugAxis = new LineSegments(
-			debugLinesGeometry,
-			debugLinesMaterial,
-		);
-		debugAxis.name = "debug_axis";
-		scene.add(debugAxis);
-	}
 	if (firstRender) {
+		const startPlacingPoint = new Vector3((-width / 2) + tileWidth / 2, (height / 2) - tileHeight / 2);
+		console.log('start point', {startPlacingPoint});
+
+		const tilesContainer = makeTiles(numTilesWidth, numTilesHeight, tileGeometry, tileMaterial);
+
+		const tileLocations = calculateTileLocations(
+			tileWidth,
+			tileHeight,
+			numTilesWidth,
+			numTilesHeight,
+			depths.ground,
+			startPlacingPoint
+		);
+		tilesContainer.children.forEach((tile: Object3D, index: number) => {
+			const position = tileLocations[index];
+			tile.position.copy(
+				position
+			);
+			tile.matrixWorldNeedsUpdate = true;
+			tile.updateMatrixWorld();
+		});
+		const enemies = new Group();
+		enemies.name = "enemies";
+		const towers = new Group();
+		towers.name = "towers";
+		scene.add(enemies, towers, tilesContainer);
+
 		camera.position.copy(new Vector3(0, 0, 1));
 		//console.log(`camera ratio: ${(tileArea.max.x - tileArea.min.x) / (tileArea.max.y - tileArea.min.y)}`, tileArea);
 		camera.left = -width / 2;
@@ -199,7 +193,27 @@ function render(gameState: GameState, firstRender: boolean): void {
 		camera.updateProjectionMatrix();
 		camera.updateMatrixWorld();
 		camera.updateMatrix();//TODO which of these do I need
-		cameraAreaSet = true;
+	}
+
+	const enemies = scene.getObjectByName("enemies");
+	const towers = scene.getObjectByName("towers");
+	if (enemies !== undefined) {
+		enemies.remove(...enemies.children);
+		//enemies.add(...newEnemies);
+	}
+	
+	if (towers !== undefined) {
+		towers.remove(...towers.children);
+		//
+	}
+
+	if (isDev) {
+		const debugAxis = new LineSegments(
+			debugLinesGeometry,
+			debugLinesMaterial,
+		);
+		debugAxis.name = "debug_axis";
+		scene.add(debugAxis);
 	}
 	requestAnimationFrame(() => {
 		renderer.render(scene, camera);
