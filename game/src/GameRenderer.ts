@@ -1,4 +1,4 @@
-import { Box3, BoxGeometry, BufferGeometry, Color, DoubleSide, EdgesGeometry, Group, LineBasicMaterial, LineSegments, Material, Mesh, MeshBasicMaterial, Object3D, OrthographicCamera, Scene, Vector3, WebGLRenderer } from "three";
+import { Box3, BoxGeometry, BufferGeometry, CircleBufferGeometry, Color, DoubleSide, EdgesGeometry, Group, LineBasicMaterial, LineSegments, Material, Mesh, MeshBasicMaterial, Object3D, OrthographicCamera, Scene, Vector3, WebGLRenderer } from "three";
 import { GameState } from "./GameState";
 
 export {
@@ -43,16 +43,32 @@ const tileMaterial = new MeshBasicMaterial({
 	side: DoubleSide,
 });
 
-const tileWidth = 50;
-const tileHeight = 50;
+const geometries: Map<string, BufferGeometry> = new Map();
+enum GeometryId {
+	tileEdge = "tileEdge",
+	tile = "tile",
+}
+const getGeometry: (key: string) => BufferGeometry = (key) => {
+	const geometry = geometries.get(key);
+	if (geometry === undefined) {
+		throw new Error(`geometry lookup failed`);
+	}
+	return geometry;
+}
 
-const tileGeometry = new BoxGeometry(tileWidth, tileHeight);
-const tileEdgesGeometry = new EdgesGeometry(tileGeometry);
+//const tileGeometry = new BoxGeometry(tileWidth, tileHeight);
+
+const enemyRadius = 50;
+const enemyGeometry = new CircleBufferGeometry(enemyRadius);
+const enemyMaterial = new MeshBasicMaterial({
+	color: colors.red
+});
 
 const edgeLinesMaterial = new LineBasicMaterial({ color: colors.black });
 
 const depths = {
 	ground: 0,
+	entities: 0.6,
 	debugEdgelines: 0.4,
 	debugAxisLines: 0.5,
 };
@@ -117,7 +133,7 @@ function makeTiles(
 	for(let tileIndex = 0, numTiles = numTilesWidth * numTilesHeight; tileIndex < numTiles; tileIndex++) {
 		const tile = new Mesh(tileGeometry, tileMaterial);
 		if (isDev) {
-			const edgeLines = new LineSegments(tileEdgesGeometry, edgeLinesMaterial);
+			const edgeLines = new LineSegments(getGeometry(GeometryId.tileEdge), edgeLinesMaterial);
 			edgeLines.name = "debug_edgelines";
 			edgeLines.position.z = depths.debugEdgelines;
 			tile.add(edgeLines);
@@ -151,15 +167,21 @@ function calculateTileLocations(
 //if I don't plan on having tiles change during runtime
 //should probably just make them once and leave them in the scene
 function render(gameState: GameState, firstRender: boolean): void {
-	const [numTilesWidth, numTilesHeight] = gameState.level.boardSize;
+	const [numTilesWidth, numTilesHeight] = gameState.level.board.size;
+	const tileWidth = gameState.level.board.tileWidth;
+	const tileHeight = gameState.level.board.tileHeight;
 	const width = numTilesWidth * tileWidth;
 	const height = numTilesHeight * tileHeight;
 	console.log(`board size: ${width}x${height}`);
 	if (firstRender) {
+		const tileGeometry = new BoxGeometry(tileWidth, tileHeight);
+		geometries.set(GeometryId.tile, tileGeometry);
+		geometries.set(GeometryId.tileEdge, new EdgesGeometry(tileGeometry));
+
 		const startPlacingPoint = new Vector3((-width / 2) + tileWidth / 2, (height / 2) - tileHeight / 2);
 		console.log('start point', {startPlacingPoint});
 
-		const tilesContainer = makeTiles(numTilesWidth, numTilesHeight, tileGeometry, tileMaterial);
+		const tilesContainer = makeTiles(numTilesWidth, numTilesHeight, getGeometry("tile"), tileMaterial);
 
 		const tileLocations = calculateTileLocations(
 			tileWidth,
@@ -199,7 +221,13 @@ function render(gameState: GameState, firstRender: boolean): void {
 	const towers = scene.getObjectByName("towers");
 	if (enemies !== undefined) {
 		enemies.remove(...enemies.children);
-		//enemies.add(...newEnemies);
+		const enemyObjects = gameState.enemies.map(enemy => {
+			const enemyMesh = new Mesh(enemyGeometry, enemyMaterial) 
+			enemyMesh.position.set(enemy.position[0], enemy.position[1], depths.entities);
+			enemyMesh.updateMatrixWorld();
+			return enemyMesh;
+		});
+		enemies.add(...enemyObjects);
 	}
 	
 	if (towers !== undefined) {

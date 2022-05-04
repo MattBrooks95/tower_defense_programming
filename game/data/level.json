@@ -1,11 +1,15 @@
 {
-	"boardSize": [32, 18],
+	"board": {
+		"size": [32, 18],
+		"tileWidth": 50,
+		"tileHeight": 50
+	},
 	"enemies": {
 		"spawn": [0, 9],
-		"speed": 125,
+		"speed": 0.06125,
 		"direction": "right",
 		"count": 10,
-		"spawnRate": 125
+		"spawnRate": 50
 	},
 	"towers": [
 		{

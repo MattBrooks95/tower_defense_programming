@@ -118,6 +118,7 @@ function simulate(prevGameState: GameState, nextGameState: GameState): void {
 	//move the enemies for this tick
 	const currentEnemies = prevGameState.enemies.map(enemy => {
 		//TODO
+		enemy.position[0] += enemy.speed * nextGameState.level.board.tileWidth;
 		return enemy;
 	});
 	//add the new enemies, if any, to the enemies list

@@ -1,5 +1,9 @@
 export type Level = {
-	boardSize: [number, number];
+	board: {
+		size: [number, number],
+		tileWidth: number;
+		tileHeight: number;
+	},
 	enemies: {
 		spawn: [number, number];
 		//in game ticks
