@@ -1,3 +1,4 @@
+import { Vector3 } from "three";
 import { Level } from "./data/level";
 import {
 	Tile,
@@ -14,7 +15,7 @@ export enum Direction { Right, Left }
 type Position = [number, number];
 
 export type Enemy = {
-	position: Position;
+	position: Vector3;
 	speed: number;
 	direction: Direction;
 }

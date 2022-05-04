@@ -1,5 +1,6 @@
 import { Box3, BoxGeometry, BufferGeometry, CircleBufferGeometry, Color, DoubleSide, EdgesGeometry, Group, LineBasicMaterial, LineSegments, Material, Mesh, MeshBasicMaterial, Object3D, OrthographicCamera, Scene, Vector3, WebGLRenderer } from "three";
 import { GameState } from "./GameState";
+import { BoardCoordinates } from "./main";
 
 export {
 	GameRenderer,
@@ -7,7 +8,11 @@ export {
 	init
 }
 
-type GameRenderer = (gameState: GameState, firstRender: boolean) => void;
+type GameRenderer = (
+	gameState: GameState,
+	firstRender: boolean,
+	boardPositions: BoardCoordinates
+) => void;
 
 ////TODO actually make this a function and not an object with extra steps
 ////TODO render the game state
@@ -59,40 +64,33 @@ const getGeometry: (key: string) => BufferGeometry = (key) => {
 //const tileGeometry = new BoxGeometry(tileWidth, tileHeight);
 
 const enemyRadius = 50;
-const enemyGeometry = new CircleBufferGeometry(enemyRadius);
+const enemyGeometry = new CircleBufferGeometry(enemyRadius, 16);
 const enemyMaterial = new MeshBasicMaterial({
 	color: colors.red
 });
 
-const edgeLinesMaterial = new LineBasicMaterial({ color: colors.black });
+//const edgeLinesMaterial = new LineBasicMaterial({ color: colors.black });
 
-const depths = {
-	ground: 0,
-	entities: 0.6,
-	debugEdgelines: 0.4,
-	debugAxisLines: 0.5,
-};
-
-const debugAxisZ = depths.debugAxisLines;
-const debugAxisPoints = [
-	new Vector3(-1000, 0, debugAxisZ),
-	new Vector3(1000, 0, debugAxisZ),
-	new Vector3(0, 1000, debugAxisZ),
-	new Vector3(0, -1000, debugAxisZ),
-	//for debugging world coords
-	new Vector3(-0.05, -0.05, debugAxisZ),
-	new Vector3(0.05, 0.05, debugAxisZ),
-	new Vector3(0.0, 0.0, debugAxisZ),
-	new Vector3(0.0, 0.1, debugAxisZ),
-	new Vector3(0.0, 0.1, debugAxisZ),
-	new Vector3(0.1, 0.1, debugAxisZ),
-	new Vector3(0.1, 0.1, debugAxisZ),
-	new Vector3(0.1, 0.0, debugAxisZ),
-	new Vector3(0.1, 0.0, debugAxisZ),
-	new Vector3(0.0, 0.0, debugAxisZ),
-];
-const debugLinesMaterial = new LineBasicMaterial({color: colors.red})
-const debugLinesGeometry = new BufferGeometry().setFromPoints(debugAxisPoints);
+//const debugAxisZ = depths.debugAxisLines;
+//const debugAxisPoints = [
+//	new Vector3(-1000, 0, debugAxisZ),
+//	new Vector3(1000, 0, debugAxisZ),
+//	new Vector3(0, 1000, debugAxisZ),
+//	new Vector3(0, -1000, debugAxisZ),
+//	//for debugging world coords
+//	new Vector3(-0.05, -0.05, debugAxisZ),
+//	new Vector3(0.05, 0.05, debugAxisZ),
+//	new Vector3(0.0, 0.0, debugAxisZ),
+//	new Vector3(0.0, 0.1, debugAxisZ),
+//	new Vector3(0.0, 0.1, debugAxisZ),
+//	new Vector3(0.1, 0.1, debugAxisZ),
+//	new Vector3(0.1, 0.1, debugAxisZ),
+//	new Vector3(0.1, 0.0, debugAxisZ),
+//	new Vector3(0.1, 0.0, debugAxisZ),
+//	new Vector3(0.0, 0.0, debugAxisZ),
+//];
+//const debugLinesMaterial = new LineBasicMaterial({color: colors.red})
+//const debugLinesGeometry = new BufferGeometry().setFromPoints(debugAxisPoints);
 
 
 let scene: Scene;
@@ -132,41 +130,27 @@ function makeTiles(
 	tilesContainer.name = "tile_container";
 	for(let tileIndex = 0, numTiles = numTilesWidth * numTilesHeight; tileIndex < numTiles; tileIndex++) {
 		const tile = new Mesh(tileGeometry, tileMaterial);
-		if (isDev) {
-			const edgeLines = new LineSegments(getGeometry(GeometryId.tileEdge), edgeLinesMaterial);
-			edgeLines.name = "debug_edgelines";
-			edgeLines.position.z = depths.debugEdgelines;
-			tile.add(edgeLines);
-		}
+		//if (isDev) {
+		//	const edgeLines = new LineSegments(getGeometry(GeometryId.tileEdge), edgeLinesMaterial);
+		//	edgeLines.name = "debug_edgelines";
+		//	edgeLines.position.z = depths.debugEdgelines;
+		//	tile.add(edgeLines);
+		//}
 		tilesContainer.add(tile);
 	}
 
 	return tilesContainer;
 }
 
-function calculateTileLocations(
-	tileWidth: number,
-	tileHeight: number,
-	numTilesX: number,
-	numTilesY: number,
-	z: number,
-	startPlacingPoint: Vector3 = new Vector3(0, 0, 0),
-): Vector3[] {
-	const positions = [];
-	for(let tileIndex = 0, numTiles = numTilesX * numTilesY; tileIndex < numTiles; tileIndex++) {
-		const xLoc = startPlacingPoint.x + tileWidth * (tileIndex % numTilesX);
-		const yLoc = startPlacingPoint.y - tileHeight * (Math.floor(tileIndex / numTilesX)); 
-		positions.push(new Vector3(xLoc, yLoc, z));
-
-	}
-
-	return positions;
-}
 
 
 //if I don't plan on having tiles change during runtime
 //should probably just make them once and leave them in the scene
-function render(gameState: GameState, firstRender: boolean): void {
+function render(
+	gameState: GameState,
+	firstRender: boolean,
+	boardPositions: BoardCoordinates
+): void {
 	const [numTilesWidth, numTilesHeight] = gameState.level.board.size;
 	const tileWidth = gameState.level.board.tileWidth;
 	const tileHeight = gameState.level.board.tileHeight;
@@ -178,21 +162,11 @@ function render(gameState: GameState, firstRender: boolean): void {
 		geometries.set(GeometryId.tile, tileGeometry);
 		geometries.set(GeometryId.tileEdge, new EdgesGeometry(tileGeometry));
 
-		const startPlacingPoint = new Vector3((-width / 2) + tileWidth / 2, (height / 2) - tileHeight / 2);
-		console.log('start point', {startPlacingPoint});
 
 		const tilesContainer = makeTiles(numTilesWidth, numTilesHeight, getGeometry("tile"), tileMaterial);
 
-		const tileLocations = calculateTileLocations(
-			tileWidth,
-			tileHeight,
-			numTilesWidth,
-			numTilesHeight,
-			depths.ground,
-			startPlacingPoint
-		);
 		tilesContainer.children.forEach((tile: Object3D, index: number) => {
-			const position = tileLocations[index];
+			const position = boardPositions.boardTileLocations[index];
 			tile.position.copy(
 				position
 			);
@@ -223,7 +197,7 @@ function render(gameState: GameState, firstRender: boolean): void {
 		enemies.remove(...enemies.children);
 		const enemyObjects = gameState.enemies.map(enemy => {
 			const enemyMesh = new Mesh(enemyGeometry, enemyMaterial) 
-			enemyMesh.position.set(enemy.position[0], enemy.position[1], depths.entities);
+			enemyMesh.position.copy(enemy.position);
 			enemyMesh.updateMatrixWorld();
 			return enemyMesh;
 		});
@@ -235,14 +209,14 @@ function render(gameState: GameState, firstRender: boolean): void {
 		//
 	}
 
-	if (isDev) {
-		const debugAxis = new LineSegments(
-			debugLinesGeometry,
-			debugLinesMaterial,
-		);
-		debugAxis.name = "debug_axis";
-		scene.add(debugAxis);
-	}
+	//if (isDev) {
+	//	const debugAxis = new LineSegments(
+	//		debugLinesGeometry,
+	//		debugLinesMaterial,
+	//	);
+	//	debugAxis.name = "debug_axis";
+	//	scene.add(debugAxis);
+	//}
 	requestAnimationFrame(() => {
 		renderer.render(scene, camera);
 		//console.log(`render count:${gameState.renderCount}`, {

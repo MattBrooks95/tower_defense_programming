@@ -18,6 +18,7 @@ import {
 } from "./GameQueue"
 import * as level from "../data/level.json";
 import { Level } from "../data/level";
+import { Vector3 } from "three";
 
 export {
 	startGame,
@@ -81,7 +82,13 @@ function runGame(
 	const { keyboardEvents } = filterEvents(gameQueue.getEvents());
 
 	handleKeyboardEvents(newGameState, keyboardEvents);
-	simulate(prevGameState, newGameState);
+	const boardPositions = calculateBoardPositions(
+		prevGameState.level.board.tileWidth,
+		prevGameState.level.board.tileHeight,
+		prevGameState.level.board.size[0],
+		prevGameState.level.board.size[1],
+	);
+	simulate(prevGameState, newGameState, boardPositions);
 
 	//console.log({
 	//	prevGameState,
@@ -90,7 +97,7 @@ function runGame(
 
 	const isFirstRender = prevGameState.renderCount == 0;
 	if (isFirstRender || !isSame(prevGameState, newGameState)) {
-		gameRenderer(newGameState, isFirstRender);
+		gameRenderer(newGameState, isFirstRender, boardPositions);
 		newGameState.renderCount++;
 	}
 
@@ -105,11 +112,71 @@ function filterEvents(newEvents: Event[]): { keyboardEvents: KeyboardEvent[] } {
 	}
 }
 
-function simulate(prevGameState: GameState, nextGameState: GameState): void {
+function calculateTileLocations(
+	tileWidth: number,
+	tileHeight: number,
+	numTilesX: number,
+	numTilesY: number,
+	z: number,
+	startPlacingPoint: Vector3 = new Vector3(0, 0, 0),
+): Vector3[] {
+	const positions = [];
+	for(let tileIndex = 0, numTiles = numTilesX * numTilesY; tileIndex < numTiles; tileIndex++) {
+		const xLoc = startPlacingPoint.x + tileWidth * (tileIndex % numTilesX);
+		const yLoc = startPlacingPoint.y - tileHeight * (Math.floor(tileIndex / numTilesX)); 
+		positions.push(new Vector3(xLoc, yLoc, z));
+
+	}
+
+	return positions;
+}
+
+const depths = {
+	ground: 0,
+	entities: 0.6,
+	debugEdgelines: 0.4,
+	debugAxisLines: 0.5,
+};
+
+export type BoardCoordinates = {
+	boardWidth: number;
+	boardHeight: number;
+	boardTileLocations: Vector3[];
+};
+
+function calculateBoardPositions(
+	tileWidth: number,
+	tileHeight: number,
+	numTilesX: number,
+	numTilesY: number,
+): BoardCoordinates {
+	const boardWidth = numTilesX * tileWidth;
+	const boardHeight = numTilesY * tileHeight;
+	const startPlacingPoint = new Vector3((-boardWidth / 2) + tileWidth / 2, (boardHeight / 2) - tileHeight / 2);
+	console.log('start point', {startPlacingPoint});
+	const boardTileLocations = calculateTileLocations(
+		tileWidth,
+		tileHeight,
+		numTilesX,
+		numTilesY,
+		depths.ground,
+		startPlacingPoint,
+	);
+
+	return {
+		boardWidth,
+		boardHeight,
+		boardTileLocations,
+	}
+}
+
+function simulate(prevGameState: GameState, nextGameState: GameState, boardCoordinates: BoardCoordinates): void {
 	const newEnemies: Enemy[] = [];
+	const { boardTileLocations } = boardCoordinates;
 	if (prevGameState.level.enemies.count > 0  && prevGameState.currentTick % prevGameState.level.enemies.spawnRate === 0) {
+		const spawnTile = prevGameState.level.enemies.spawn;
 		newEnemies.push({
-			position: [0, 0],//TODO figure out world units
+			position: boardTileLocations[spawnTile].clone().setZ(depths.entities),
 			speed: prevGameState.level.enemies.speed,
 			direction: prevGameState.level.enemies.direction === "right" ? Direction.Right : Direction.Left,
 		});
@@ -117,8 +184,8 @@ function simulate(prevGameState: GameState, nextGameState: GameState): void {
 	}
 	//move the enemies for this tick
 	const currentEnemies = prevGameState.enemies.map(enemy => {
-		//TODO
-		enemy.position[0] += enemy.speed * nextGameState.level.board.tileWidth;
+		//TODO make sure this change in position is reflected
+		enemy.position.x += enemy.speed * nextGameState.level.board.tileWidth;
 		return enemy;
 	});
 	//add the new enemies, if any, to the enemies list

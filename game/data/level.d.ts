@@ -5,7 +5,7 @@ export type Level = {
 		tileHeight: number;
 	},
 	enemies: {
-		spawn: [number, number];
+		spawn: number;
 		//in game ticks
 		speed: number;
 		direction: string;
