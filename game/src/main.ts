@@ -106,7 +106,7 @@ function filterEvents(newEvents: Event[]): { keyboardEvents: KeyboardEvent[] } {
 
 function simulate(prevGameState: GameState, nextGameState: GameState): void {
 	const newEnemies: Enemy[] = [];
-	if (prevGameState.level.enemies.count > 0  && prevGameState.currentTick % prevGameState.level.enemies.spawnRate) {
+	if (prevGameState.level.enemies.count > 0  && prevGameState.currentTick % prevGameState.level.enemies.spawnRate === 0) {
 		newEnemies.push({
 			position: [0, 0],//TODO figure out world units
 			speed: prevGameState.level.enemies.speed,

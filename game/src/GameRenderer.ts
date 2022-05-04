@@ -114,9 +114,8 @@ function render(gameState: GameState): void {
 	const width = numTilesWidth * tileWidth;
 	const height = numTilesHeight * tileHeight;
 	console.log(`board size: ${width}x${height}`);
-	//const tilesContainer: Group = new Group();
-	//tilesContainer.name = "tile_container";
-	const tiles: Object3D[] = [];
+	const tilesContainer: Group = new Group();
+	tilesContainer.name = "tile_container";
 
 	const startPlacingPoint = new Vector3((-width / 2) + tileWidth / 2, (height / 2) - tileHeight / 2);
 	console.log('start point', {startPlacingPoint});
@@ -129,11 +128,11 @@ function render(gameState: GameState): void {
 			edgeLines.position.z = depths.debugEdgelines;
 			tile.add(edgeLines);
 		}
-		tiles.push(tile);
+		tilesContainer.add(tile);
 	}
 
 	const tilePlacements: {xLoc: number; yLoc: number;}[] = [];
-	tiles.forEach((tile: Object3D, index: number) => {
+	tilesContainer.children.forEach((tile: Object3D, index: number) => {
 		const xLoc = startPlacingPoint.x + tileWidth * (index % numTilesWidth);
 		const yLoc = startPlacingPoint.y - tileHeight * (Math.floor(index / numTilesWidth)); 
 		tile.position.set(
@@ -146,7 +145,7 @@ function render(gameState: GameState): void {
 		tile.updateMatrixWorld();
 	});
 	scene.remove(...scene.children);
-	scene.add(...tiles);
+	scene.add(tilesContainer);
 	
 	const tileArea = new Box3().setFromObject(scene);
 	console.log(tilePlacements, /*tilesContainer,*/ tileArea);
