@@ -1,4 +1,4 @@
-import { Box3, BoxGeometry, BufferGeometry, Color, DoubleSide, EdgesGeometry, Group, LineBasicMaterial, LineSegments, Mesh, MeshBasicMaterial, Object3D, OrthographicCamera, Scene, Vector3, WebGLRenderer } from "three";
+import { Box3, BoxGeometry, BufferGeometry, Color, DoubleSide, EdgesGeometry, Group, LineBasicMaterial, LineSegments, Material, Mesh, MeshBasicMaterial, Object3D, OrthographicCamera, Scene, Vector3, WebGLRenderer } from "three";
 import { GameState } from "./GameState";
 
 export {
@@ -107,19 +107,14 @@ function init(canvas: HTMLCanvasElement): {
 	}
 }
 
-//if I don't plan on having tiles change during runtime
-//should probably just make them once and leave them in the scene
-function render(gameState: GameState): void {
-	const [numTilesWidth, numTilesHeight] = gameState.level.boardSize;
-	const width = numTilesWidth * tileWidth;
-	const height = numTilesHeight * tileHeight;
-	console.log(`board size: ${width}x${height}`);
+function makeTiles(
+	numTilesWidth: number,
+	numTilesHeight: number,
+	tileGeometry: BufferGeometry,
+	tileMaterial: Material,
+): Object3D {
 	const tilesContainer: Group = new Group();
 	tilesContainer.name = "tile_container";
-
-	const startPlacingPoint = new Vector3((-width / 2) + tileWidth / 2, (height / 2) - tileHeight / 2);
-	console.log('start point', {startPlacingPoint});
-
 	for(let tileIndex = 0, numTiles = numTilesWidth * numTilesHeight; tileIndex < numTiles; tileIndex++) {
 		const tile = new Mesh(tileGeometry, tileMaterial);
 		if (isDev) {
@@ -131,16 +126,55 @@ function render(gameState: GameState): void {
 		tilesContainer.add(tile);
 	}
 
-	const tilePlacements: {xLoc: number; yLoc: number;}[] = [];
+	return tilesContainer;
+}
+
+function calculateTileLocations(
+	tileWidth: number,
+	tileHeight: number,
+	numTilesX: number,
+	numTilesY: number,
+	z: number,
+	startPlacingPoint: Vector3 = new Vector3(0, 0, 0),
+): Vector3[] {
+	const positions = [];
+	for(let tileIndex = 0, numTiles = numTilesX * numTilesY; tileIndex < numTiles; tileIndex++) {
+		const xLoc = startPlacingPoint.x + tileWidth * (tileIndex % numTilesX);
+		const yLoc = startPlacingPoint.y - tileHeight * (Math.floor(tileIndex / numTilesX)); 
+		positions.push(new Vector3(xLoc, yLoc, z));
+
+	}
+
+	return positions;
+}
+
+
+//if I don't plan on having tiles change during runtime
+//should probably just make them once and leave them in the scene
+function render(gameState: GameState): void {
+	const [numTilesWidth, numTilesHeight] = gameState.level.boardSize;
+	const width = numTilesWidth * tileWidth;
+	const height = numTilesHeight * tileHeight;
+	console.log(`board size: ${width}x${height}`);
+
+	const startPlacingPoint = new Vector3((-width / 2) + tileWidth / 2, (height / 2) - tileHeight / 2);
+	console.log('start point', {startPlacingPoint});
+
+	const tilesContainer = makeTiles(numTilesWidth, numTilesHeight, tileGeometry, tileMaterial);
+
+	const tileLocations = calculateTileLocations(
+		tileWidth,
+		tileHeight,
+		numTilesWidth,
+		numTilesHeight,
+		depths.ground,
+		startPlacingPoint
+	);
 	tilesContainer.children.forEach((tile: Object3D, index: number) => {
-		const xLoc = startPlacingPoint.x + tileWidth * (index % numTilesWidth);
-		const yLoc = startPlacingPoint.y - tileHeight * (Math.floor(index / numTilesWidth)); 
-		tile.position.set(
-			xLoc,
-			yLoc,
-			depths.ground
+		const position = tileLocations[index];
+		tile.position.copy(
+			position
 		);
-		tilePlacements.push({ xLoc, yLoc });
 		tile.matrixWorldNeedsUpdate = true;
 		tile.updateMatrixWorld();
 	});
@@ -148,7 +182,6 @@ function render(gameState: GameState): void {
 	scene.add(tilesContainer);
 	
 	const tileArea = new Box3().setFromObject(scene);
-	console.log(tilePlacements, /*tilesContainer,*/ tileArea);
 	const tileAreaCenter = new Vector3();
 	tileArea.getCenter(tileAreaCenter);
 	const tileAreaWidth = tileArea.max.x - tileArea.min.x;
