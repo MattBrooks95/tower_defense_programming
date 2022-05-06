@@ -18,4 +18,7 @@ export type Level = {
 		//in game ticks
 		fireRate: number;
 	}[];
+	player: {
+		hitpoints: number;
+	};
 }

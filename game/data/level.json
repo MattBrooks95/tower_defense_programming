@@ -20,5 +20,8 @@
 			"position": [11, 10],
 			"fireRate": 250
 		}
-	]
+	],
+	"player": {
+		"hitpoints": 2
+	}
 }

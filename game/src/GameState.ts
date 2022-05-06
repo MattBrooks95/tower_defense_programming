@@ -1,5 +1,5 @@
 import { Vector3 } from "three";
-import { Level } from "./data/level";
+import { Level } from "../data/level";
 import {
 	Tile,
 } from "./Tile"
@@ -37,7 +37,9 @@ type GameState = {
 	renderCount: number;
 }
 
-function getInitialGameState(level: Level): GameState {
+//TODO figure out how to get the level to use the typings from the .d.ts file
+//player hitpoints are missing for some reason
+function getInitialGameState(level: any): GameState {
 	return {
 		over: false,
 		tiles: [],
