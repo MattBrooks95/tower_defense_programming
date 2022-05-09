@@ -157,8 +157,11 @@ function calculateBoardPositions(
 	numTilesY: number,
 ): BoardCoordinates {
 	const boardWidth = numTilesX * tileWidth;
+	const halfBoardWidth = boardWidth / 2;
 	const boardHeight = numTilesY * tileHeight;
-	const startPlacingPoint = new Vector3((-boardWidth / 2) + tileWidth / 2, (boardHeight / 2) - tileHeight / 2);
+	const halfBoardHeight = boardHeight / 2;
+
+	const startPlacingPoint = new Vector3((-halfBoardWidth) + tileWidth / 2, (halfBoardHeight) - tileHeight / 2);
 	//console.log('start point', {startPlacingPoint});
 	const boardTileLocations = calculateTileLocations(
 		tileWidth,
@@ -170,8 +173,8 @@ function calculateBoardPositions(
 	);
 
 	const escapeLimit: Box2 = new Box2(
-		new Vector2(-boardWidth, -boardHeight),
-		new Vector2(boardWidth, boardHeight),
+		new Vector2(-halfBoardWidth, -halfBoardHeight),
+		new Vector2(halfBoardWidth, halfBoardHeight),
 	);
 
 	return {

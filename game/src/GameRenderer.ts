@@ -1,4 +1,4 @@
-import { Box3, BoxGeometry, BufferGeometry, CircleBufferGeometry, Color, DoubleSide, EdgesGeometry, Group, LineBasicMaterial, LineSegments, Material, Mesh, MeshBasicMaterial, Object3D, OrthographicCamera, Scene, Vector3, WebGLRenderer } from "three";
+import { Box3, BoxGeometry, BufferGeometry, CircleBufferGeometry, Color, DoubleSide, EdgesGeometry, Group, LineBasicMaterial, LineSegments, Material, Mesh, MeshBasicMaterial, Object3D, OrthographicCamera, Scene, Vector2, Vector3, WebGLRenderer } from "three";
 import { GameState } from "./GameState";
 import { BoardCoordinates } from "./main";
 
@@ -162,6 +162,44 @@ function render(
 		geometries.set(GeometryId.tile, tileGeometry);
 		geometries.set(GeometryId.tileEdge, new EdgesGeometry(tileGeometry));
 
+		if (isDev) {
+			const { escapeLimit } = boardPositions;
+			console.log({ escapeLimit });
+			const escapeLimitMesh = new LineSegments(
+				new BufferGeometry().setFromPoints([
+					//new Vector3(-50, -50, 0.9),
+					//new Vector3(-50, 50, 0.9),
+
+					//new Vector3(-50, 50, 0.9),
+					//new Vector3(50, 50, 0.9),
+
+					//new Vector3(50, 50, 0.9),
+					//new Vector3(50, -50, 0.9),
+
+					//new Vector3(50, -50, 0.9),
+					//new Vector3(-50, -50, 0.9),
+
+					//TODO figure out a way to share these depths with the game logic code
+					//or declare the existance of this object within the game state
+					new Vector3(escapeLimit.min.x, escapeLimit.min.y, 0.9),
+					new Vector3(escapeLimit.min.x, escapeLimit.max.y, 0.9),
+
+					new Vector3(escapeLimit.min.x, escapeLimit.max.y, 0.9),
+					new Vector3(escapeLimit.max.x, escapeLimit.max.y, 0.9),
+
+					new Vector3(escapeLimit.max.x, escapeLimit.max.y, 0.9),
+					new Vector3(escapeLimit.max.x, escapeLimit.min.y, 0.9),
+
+					new Vector3(escapeLimit.max.x, escapeLimit.min.y, 0.9),
+					new Vector3(escapeLimit.min.x, escapeLimit.min.y, 0.9),
+				]),
+				new LineBasicMaterial({
+					color: colors.red,
+				})
+			);
+			escapeLimitMesh.name = "escapeLimit";
+			scene.add(escapeLimitMesh);
+		}
 
 		const tilesContainer = makeTiles(numTilesWidth, numTilesHeight, getGeometry("tile"), tileMaterial);
 
