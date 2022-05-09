@@ -156,7 +156,7 @@ function render(
 	const tileHeight = gameState.level.board.tileHeight;
 	const width = numTilesWidth * tileWidth;
 	const height = numTilesHeight * tileHeight;
-	console.log(`board size: ${width}x${height}`);
+	//console.log(`board size: ${width}x${height}`);
 	if (firstRender) {
 		const tileGeometry = new BoxGeometry(tileWidth, tileHeight);
 		geometries.set(GeometryId.tile, tileGeometry);
@@ -180,11 +180,12 @@ function render(
 		scene.add(enemies, towers, tilesContainer);
 
 		camera.position.copy(new Vector3(0, 0, 1));
+		const padding = isDev ? 50 : 0;
 		//console.log(`camera ratio: ${(tileArea.max.x - tileArea.min.x) / (tileArea.max.y - tileArea.min.y)}`, tileArea);
-		camera.left = -width / 2;
-		camera.right = width / 2;
-		camera.top = height / 2;
-		camera.bottom = -height / 2;
+		camera.left = -width / 2 - padding;
+		camera.right = width / 2 + padding;
+		camera.top = height / 2 + padding;
+		camera.bottom = -height / 2 - padding;
 
 		camera.updateProjectionMatrix();
 		camera.updateMatrixWorld();

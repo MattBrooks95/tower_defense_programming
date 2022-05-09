@@ -159,7 +159,7 @@ function calculateBoardPositions(
 	const boardWidth = numTilesX * tileWidth;
 	const boardHeight = numTilesY * tileHeight;
 	const startPlacingPoint = new Vector3((-boardWidth / 2) + tileWidth / 2, (boardHeight / 2) - tileHeight / 2);
-	console.log('start point', {startPlacingPoint});
+	//console.log('start point', {startPlacingPoint});
 	const boardTileLocations = calculateTileLocations(
 		tileWidth,
 		tileHeight,
@@ -183,7 +183,7 @@ function calculateBoardPositions(
 }
 
 function simulate(prevGameState: GameState, nextGameState: GameState, boardCoordinates: BoardCoordinates): void {
-	console.log({ prevGameState, nextGameState });
+	//console.log({ prevGameState, nextGameState });
 	const newEnemies: Enemy[] = [];
 	const { boardTileLocations, escapeLimit } = boardCoordinates;
 	if (prevGameState.level.enemies.count > 0  && prevGameState.currentTick % prevGameState.level.enemies.spawnRate === 0) {
@@ -210,7 +210,7 @@ function simulate(prevGameState: GameState, nextGameState: GameState, boardCoord
 		return enemy;
 	});
 	nextGameState.level.player.hitpoints -= enemiesWhoEscaped;
-	console.log(`hitpoints:${nextGameState.level.player.hitpoints}`);
+	//console.log(`hitpoints:${nextGameState.level.player.hitpoints}`);
 	if (nextGameState.level.player.hitpoints <= 0) {
 		console.log('player lost due to escaped enemies');
 		nextGameState.over = true;
