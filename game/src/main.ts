@@ -215,7 +215,6 @@ function simulate(prevGameState: GameState, nextGameState: GameState, boardCoord
 	const enemiesWhoEscaped = numEnemiesStart - currentEnemies.length;
 	//move the enemies for this tick
 	currentEnemies.forEach(enemy => {
-		//TODO make sure this change in position is reflected
 		enemy.position.x += enemy.speed * nextGameState.level.board.tileWidth;
 		return enemy;
 	});

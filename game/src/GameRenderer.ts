@@ -15,28 +15,6 @@ type GameRenderer = (
 	depths: Object
 ) => void;
 
-////TODO actually make this a function and not an object with extra steps
-////TODO render the game state
-//function newGameRenderer() {
-//	return {
-//		//TODO requestAnimationFrame
-//		render: (state: GameState) => console.log('TODO render', state),
-//	}
-//}
-
-//const materialCache = () => {
-//	const materials: Map<string, Material> = {};
-//	return (materialCode: string) => {
-//		let material = materials.get(materialCode);
-//		if (!(material instanceof Material)) {
-//			return material;
-//		} else {
-//		}
-//
-//	}
-//
-//}
-
 const colors = {
 	green: new Color(0, 1, 0),
 	black: new Color(0, 0, 0),
@@ -106,9 +84,6 @@ function init(canvas: HTMLCanvasElement): {
 	renderer = new WebGLRenderer({
 		canvas,
 	});
-
-	//TODO this seems unnecessary
-	//renderer.setSize(canvas.width, canvas.height);
 
 	renderer.setClearColor(new Color(0.2, 0.2, 0.2), 1);
 	camera = new OrthographicCamera();
@@ -215,7 +190,6 @@ function render(
 
 		camera.updateProjectionMatrix();
 		camera.updateMatrixWorld();
-		camera.updateMatrix();//TODO which of these do I need
 	}
 
 	const enemies = scene.getObjectByName("enemies");
