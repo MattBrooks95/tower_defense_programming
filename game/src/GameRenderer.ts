@@ -1,6 +1,6 @@
 import { Box3, BoxGeometry, BufferGeometry, CircleBufferGeometry, Color, DoubleSide, EdgesGeometry, Group, LineBasicMaterial, LineSegments, Material, Mesh, MeshBasicMaterial, Object3D, OrthographicCamera, Scene, Vector2, Vector3, WebGLRenderer } from "three";
 import { GameState } from "./GameState";
-import { BoardCoordinates } from "./main";
+import { BoardCoordinates, GameDepths } from "./main";
 
 export {
 	GameRenderer,
@@ -11,7 +11,8 @@ export {
 type GameRenderer = (
 	gameState: GameState,
 	firstRender: boolean,
-	boardPositions: BoardCoordinates
+	boardPositions: BoardCoordinates,
+	depths: Object
 ) => void;
 
 ////TODO actually make this a function and not an object with extra steps
@@ -149,7 +150,8 @@ function makeTiles(
 function render(
 	gameState: GameState,
 	firstRender: boolean,
-	boardPositions: BoardCoordinates
+	boardPositions: BoardCoordinates,
+	depths: GameDepths,
 ): void {
 	const [numTilesWidth, numTilesHeight] = gameState.level.board.size;
 	const tileWidth = gameState.level.board.tileWidth;
@@ -167,31 +169,17 @@ function render(
 			console.log({ escapeLimit });
 			const escapeLimitMesh = new LineSegments(
 				new BufferGeometry().setFromPoints([
-					//new Vector3(-50, -50, 0.9),
-					//new Vector3(-50, 50, 0.9),
+					new Vector3(escapeLimit.min.x, escapeLimit.min.y, depths.debugEdgeLines),
+					new Vector3(escapeLimit.min.x, escapeLimit.max.y, depths.debugEdgeLines),
 
-					//new Vector3(-50, 50, 0.9),
-					//new Vector3(50, 50, 0.9),
+					new Vector3(escapeLimit.min.x, escapeLimit.max.y, depths.debugEdgeLines),
+					new Vector3(escapeLimit.max.x, escapeLimit.max.y, depths.debugEdgeLines),
 
-					//new Vector3(50, 50, 0.9),
-					//new Vector3(50, -50, 0.9),
+					new Vector3(escapeLimit.max.x, escapeLimit.max.y, depths.debugEdgeLines),
+					new Vector3(escapeLimit.max.x, escapeLimit.min.y, depths.debugEdgeLines),
 
-					//new Vector3(50, -50, 0.9),
-					//new Vector3(-50, -50, 0.9),
-
-					//TODO figure out a way to share these depths with the game logic code
-					//or declare the existance of this object within the game state
-					new Vector3(escapeLimit.min.x, escapeLimit.min.y, 0.9),
-					new Vector3(escapeLimit.min.x, escapeLimit.max.y, 0.9),
-
-					new Vector3(escapeLimit.min.x, escapeLimit.max.y, 0.9),
-					new Vector3(escapeLimit.max.x, escapeLimit.max.y, 0.9),
-
-					new Vector3(escapeLimit.max.x, escapeLimit.max.y, 0.9),
-					new Vector3(escapeLimit.max.x, escapeLimit.min.y, 0.9),
-
-					new Vector3(escapeLimit.max.x, escapeLimit.min.y, 0.9),
-					new Vector3(escapeLimit.min.x, escapeLimit.min.y, 0.9),
+					new Vector3(escapeLimit.max.x, escapeLimit.min.y, depths.debugEdgeLines),
+					new Vector3(escapeLimit.min.x, escapeLimit.min.y, depths.debugEdgeLines),
 				]),
 				new LineBasicMaterial({
 					color: colors.red,

@@ -101,7 +101,7 @@ function runGame(
 
 	const isFirstRender = prevGameState.renderCount == 0;
 	if (isFirstRender || !isSame(prevGameState, newGameState)) {
-		gameRenderer(newGameState, isFirstRender, boardPositions);
+		gameRenderer(newGameState, isFirstRender, boardPositions, depths);
 		newGameState.renderCount++;
 	}
 
@@ -135,10 +135,17 @@ function calculateTileLocations(
 	return positions;
 }
 
-const depths = {
+export type GameDepths = {
+	ground: number;
+	entities: number;
+	debugEdgeLines: number;
+	debugAxisLines: number;
+}
+
+const depths: GameDepths = {
 	ground: 0,
 	entities: 0.6,
-	debugEdgelines: 0.4,
+	debugEdgeLines: 0.4,
 	debugAxisLines: 0.5,
 };
 
